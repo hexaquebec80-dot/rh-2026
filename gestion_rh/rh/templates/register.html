@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Inscription | HexaQuébec{% endblock %}
+
+{% block css %}
+<style>
+body {
+    background: linear-gradient(135deg, #0a1a33, #0d6efd);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.register-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.register-card {
+     background: linear-gradient(145deg, #ffffff, #f0f6ff);
+    border-radius: 22px;
+    padding: 2.8rem;
+    width: 100%;
+    max-width: 620px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+}
+
+.register-title {
+    font-weight: 700;
+    color: #0a1a33;
+}
+
+.form-control,
+.form-select {
+    border-radius: 12px;
+    padding: 0.75rem 0.9rem;
+}
+
+.btn-primary {
+    border-radius: 14px;
+    font-weight: 600;
+    padding: 0.9rem;
+}
+/* 🚨 Alertes modernes */
+.alert {
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: #ffffff !important;
+    animation: slideFade 0.5s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* ❌ Erreur */
+.alert-error,
+.alert-danger {
+    background: linear-gradient(135deg, #dc3545, #b02a37);
+}
+
+/* ✅ Succès */
+.alert-success {
+    background: linear-gradient(135deg, #198754, #146c43);
+}
+
+/* ℹ️ Info */
+.alert-info {
+    background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
+}
+
+/* 🎞️ Animation */
+@keyframes slideFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+    {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="register-wrapper">
+  <div class="register-card">
+
+    <h2 class="text-center mb-4 register-title">
+      Inscription Employeur
+    </h2>
+
+    <!-- ✅ UN SEUL FORMULAIRE -->
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Nom -->
+      <div class="mb-3">
+        <label class="form-label">Nom de l’entreprise</label>
+        <input type="text" name="nom" class="form-control" required>
+      </div>
+
+      <!-- Adresse -->
+      <div class="mb-3">
+        <label class="form-label">Adresse de l’entreprise (Canada)</label>
+        <input
+          type="text"
+          name="rue"
+          class="form-control"
+          placeholder="Ex : 123 Rue Sainte-Catherine O, Montréal"
+          required
+        >
+      </div>
+
+      <!-- Code postal -->
+      <div class="mb-3">
+        <label class="form-label">Code postal</label>
+        <input
+          type="text"
+          name="code_postal"
+          class="form-control"
+          placeholder="H1A 2B3"
+          required
+          pattern="^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$"
+          title="Format canadien : A1A 1A1"
+        >
+      </div>
+
+      <!-- Province -->
+      <div class="mb-3">
+        <label class="form-label">Province</label>
+        <select name="province" class="form-select" required>
+          <option value="">-- Sélectionner --</option>
+          <option value="QC">Québec</option>
+          <option value="ON">Ontario</option>
+          <option value="BC">Colombie-Britannique</option>
+          <option value="AB">Alberta</option>
+          <option value="MB">Manitoba</option>
+          <option value="SK">Saskatchewan</option>
+          <option value="NS">Nouvelle-Écosse</option>
+          <option value="NB">Nouveau-Brunswick</option>
+          <option value="PE">Île-du-Prince-Édouard</option>
+          <option value="NL">Terre-Neuve-et-Labrador</option>
+          <option value="NT">Territoires du Nord-Ouest</option>
+          <option value="NU">Nunavut</option>
+          <option value="YT">Yukon</option>
+        </select>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="mb-3">
+        <label class="form-label">Téléphone</label>
+        <input
+          type="text"
+          name="telephone"
+          class="form-control"
+          placeholder="514-555-1234"
+          required
+        >
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label">Adresse email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+
+      <!-- Logo -->
+      <div class="mb-3">
+        <label class="form-label">Logo de l’entreprise</label>
+        <input
+          type="file"
+          name="logo"
+          class="form-control"
+          accept="image/png, image/jpeg"
+        >
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="mb-3">
+        <label class="form-label">Mot de passe</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <!-- Confirmation -->
+      <div class="mb-4">
+        <label class="form-label">Confirmer le mot de passe</label>
+        <input
+          type="password"
+          name="confirm_password"
+          class="form-control"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn-primary w-100">
+        Créer mon compte
+      </button>
+
+  
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

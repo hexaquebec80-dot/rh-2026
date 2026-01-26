@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}HexaQuébec RH{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  {% block css %}{% endblock %}
+</head>
+<style>
+ body {
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  background: #0b1d2a;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Image de fond professionnelle */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.55) saturate(1.1);
+  transform: scale(1);
+  animation: slowZoom 18s ease-in-out infinite alternate;
+  z-index: -2;
+}
+
+/* Voile élégant (lisibilité) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 40, 80, 0.65),
+    rgba(0, 120, 215, 0.55)
+  );
+  z-index: -1;
+}
+
+/* Animation douce */
+@keyframes slowZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+
+  /* Supprimer le margin/padding du container hérité de base */
+  .page-wrapper {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .register-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 80%;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.8s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .register-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .register-card h2 {
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    color: #b71c1c;
+    text-align: center;
+  }
+
+  .form-control, .form-select {
+    border-radius: 10px;
+    padding: 0.65rem;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #b71c1c;
+    box-shadow: 0 0 8px rgba(183, 28, 28, 0.3);
+  }
+
+  .btn-danger {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.75rem;
+    background: #b71c1c;
+    border: none;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .btn-danger:hover {
+    background: #d32f2f;
+    transform: scale(1.03);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+<body>
+
+  <div class="container mt-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert" 
+           style="border-radius: 12px; font-weight: 500; font-size: 1rem;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+  {% block content %}{% endblock %}
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  {% block scripts %}
+  <script>
+  var map = L.map('map').setView([46.8, -71.2], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+</script>
+<script>
+  // Au clic sur le bouton, on affiche ou on cache le profil
+  document.getElementById("btnProfil").addEventListener("click", function() {
+    const profil = document.getElementById("profilEntreprise");
+    profil.classList.toggle("d-none"); // Bascule entre visible/caché
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btnEdit = document.getElementById("btnEdit");
+  const btnCancel = document.getElementById("btnCancel");
+  const profilView = document.getElementById("profilView");
+  const profilEditForm = document.getElementById("profilEditForm");
+
+  btnEdit.addEventListener("click", () => {
+    profilView.style.display = "none";
+    profilEditForm.style.display = "block";
+  });
+
+  btnCancel.addEventListener("click", () => {
+    profilEditForm.style.display = "none";
+    profilView.style.display = "block";
+  });
+});
+</script>
+
+<!-- SCRIPT -->
+<script>
+document.getElementById('btnEdit').addEventListener('click', () => {
+  document.getElementById('profilView').style.display = 'none';
+  document.getElementById('profilEditForm').style.display = 'block';
+});
+
+document.getElementById('btnCancel').addEventListener('click', () => {
+  document.getElementById('profilEditForm').style.display = 'none';
+  document.getElementById('profilView').style.display = 'block';
+});
+</script>
+
+<script>
+  // Afficher / cacher la carte profil
+  const btnProfil = document.getElementById("btnProfil");
+  const profilCard = document.getElementById("profilEntreprise");
+
+  btnProfil.addEventListener("click", () => {
+    profilCard.style.display = (profilCard.style.display === "none" || profilCard.style.display === "") 
+      ? "block" 
+      : "none";
+  });
+
+  // Mode édition du profil
+  document.addEventListener("DOMContentLoaded", function() {
+    const btnEdit = document.getElementById("btnEdit");
+    const btnCancel = document.getElementById("btnCancel");
+    const profilView = document.getElementById("profilView");
+    const profilEditForm = document.getElementById("profilEditForm");
+
+    btnEdit.addEventListener("click", () => {
+      profilView.style.display = "none";
+      profilEditForm.style.display = "block";
+    });
+
+    btnCancel.addEventListener("click", () => {
+      profilEditForm.style.display = "none";
+      profilView.style.display = "block";
+    });
+  });
+
+  
+
+  document.addEventListener("DOMContentLoaded", function () {
+  const box = document.querySelector(".trust-box");
+
+  if (!box) return;
+
+  function replayAnimation() {
+    box.classList.remove("animate");
+    void box.offsetWidth; // force reflow (clé magique)
+    box.classList.add("animate");
+  }
+
+  // Lancement initial
+  replayAnimation();
+
+  // Rejoue toutes les 10 secondes
+  setInterval(replayAnimation, 10000);
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const box = document.querySelector(".trust-box");
+
+  if (!box) return;
+
+  function playAd() {
+    box.classList.remove("play");
+    void box.offsetHeight; // reset animation
+    box.classList.add("play");
+  }
+
+  // Première lecture
+  playAd();
+
+  // Relance toutes les 10 secondes
+  setInterval(playAd, 10000);
+});
+
+
+
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      alert.style.opacity = '0';
+      alert.style.transform = 'translateX(40px)';
+      setTimeout(() => alert.remove(), 400);
+    });
+  }, 4000);
+
+
+
+    const statut = document.getElementById("statutCanadien");
+  const nasField = document.getElementById("nasField");
+  const nasInput = document.getElementById("nasInput");
+
+  statut.addEventListener("change", () => {
+    if (statut.value === "etranger") {
+      nasField.classList.remove("d-none");
+      nasInput.required = true;
+    } else {
+      nasField.classList.add("d-none");
+      nasInput.required = false;
+      nasInput.value = "";
+    }
+  });
+
+
+  </script>
+  
+  {% endblock %}
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Choisir une adresse</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+
+    h3 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    /* IMPORTANT pour éviter bugs d’affichage */
+    .pac-container {
+      z-index: 99999 !important;
+    }
+  </style>
+</head>
+<body>
+
+<h3>Rechercher une adresse au Canada</h3>
+
+<input
+  type="text"
+  id="searchAdresse"
+  placeholder="Ex : 123 Rue Sainte-Catherine O, Montréal"
+  autocomplete="street-address"
+/>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API_GOOGLE&libraries=places&language=fr&region=CA"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const input = document.getElementById("searchAdresse");
+
+  const autocomplete = new google.maps.places.Autocomplete(input, {
+    componentRestrictions: { country: "ca" },
+    types: ["address"]
+  });
+
+  // ✅ Seulement si l’utilisateur CLIQUE une suggestion
+  autocomplete.addListener("place_changed", function () {
+    const place = autocomplete.getPlace();
+
+    if (!place || !place.formatted_address) return;
+
+    // 📤 Envoi vers la page principale
+    if (window.opener) {
+      window.opener.postMessage(
+        {
+          adresse: place.formatted_address,
+          latitude: place.geometry ? place.geometry.location.lat() : "",
+          longitude: place.geometry ? place.geometry.location.lng() : ""
+        },
+        "*"
+      );
+    }
+
+    window.close();
+  });
+
+});
+</script>
+
+</body>
+</html>

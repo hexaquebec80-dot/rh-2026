@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Envoyer une Référence{% endblock %}
+
+{% block content %}
+<style>
+  /* 🌟 Style professionnel et animé */
+  .card-animated {
+    max-width: 650px;
+    margin: 50px auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #ffffff, #f0f6ff);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: scale(0.97);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .card-animated:hover {
+    transform: scale(1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    color: white;
+    border: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  }
+
+  .btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #6610f2, #007bff);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Animation d’apparition */
+  .fade-in {
+    animation: fadeIn 0.7s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="container fade-in">
+  <div class="card card-animated">
+    <div class="card-header text-center py-3">
+      <h3 class="mb-0"><i class="bi bi-person-check me-2"></i>Envoyer une Référence</h3>
+    </div>
+    <div class="card-body p-4">
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Informations sur l’employé -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nom de l’employé *</label>
+            <input type="text" name="nom_employe" class="form-control" placeholder="Ex: Kamara" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Prénom de l’employé *</label>
+            <input type="text" name="prenom_employe" class="form-control" placeholder="Ex: Diambere" required>
+          </div>
+        </div>
+
+        <!-- Poste et numéro -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Poste occupé *</label>
+            <input type="text" name="poste" class="form-control" placeholder="Ex: Technicien RH" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Numéro d’employé *</label>
+            <input type="text" name="numero_employe" class="form-control" placeholder="EMP-12345" required>
+          </div>
+        </div>
+
+        <!-- Entreprise de réception -->
+        <div class="mb-3">
+          <label class="form-label">Entreprise destinataire *</label>
+          <select name="entreprise_reception" class="form-select" required>
+            <option value="">-- Sélectionnez une entreprise --</option>
+            {% for entreprise in entreprises %}
+              <option value="{{ entreprise.nom }}">{{ entreprise.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Date de la référence -->
+        <div class="mb-3">
+          <label class="form-label">Date de la référence *</label>
+          <input type="date" name="date_reference" class="form-control" required>
+        </div>
+
+        <!-- Message facultatif -->
+        <div class="mb-3">
+          <label class="form-label">Message (facultatif)</label>
+          <textarea name="message" class="form-control" rows="4" placeholder="Entrez un message ou une remarque..."></textarea>
+        </div>
+
+        <!-- Boutons -->
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'profil_employeur' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Retour au profil
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-send me-1"></i> Envoyer la Référence
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Validation Bootstrap -->
+<script>
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+
+{% endblock %}

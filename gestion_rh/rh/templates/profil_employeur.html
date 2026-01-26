@@ -1,0 +1,838 @@
+{% extends "base.html" %}
+{% block title %}Profil Employeur{% endblock %}
+
+{% block css %}
+<style>
+:root{
+  --primary:#0d6efd;
+  --success:#198754;
+  --danger:#dc3545;
+  --warning:#ffc107;
+  --dark:#1f2937;
+  --radius:18px;
+}
+
+body{
+  background:linear-gradient(135deg,#eef2f7,#f9fbfd);
+  font-family:'Inter','Poppins',sans-serif;
+}
+
+h3{
+  font-weight:700;
+  text-align:center;
+  color:#eef2f7;
+  margin-bottom:2rem;
+}
+
+h5 {
+  font-weight: 700; /* Plus impactant */
+  color: #d4cbcb79; /* Rouge moderne, élégant et visible */
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.15rem; /* Taille légèrement plus grande pour hiérarchie */
+  letter-spacing: 0.5px; /* Espacement subtil entre les lettres */
+  text-transform: uppercase; /* Optionnel : style moderne */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Ombre très légère pour profondeur */
+  transition: color 0.3s ease;
+}
+
+h5:hover {
+  color: #598c1f; /* Rouge plus foncé au survol pour effet dynamique */
+  cursor: default;
+}
+
+
+/* ===== HEADER ===== */
+.employer-header{
+  background:#fff;
+  padding:1.5rem;
+  border-radius:var(--radius);
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:2rem;
+}
+
+.employer-info{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.employer-info img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--primary);
+}
+
+.employer-name{
+  font-size:1.2rem;
+  font-weight:600;
+}
+
+/* ===== CARDS ===== */
+.card{
+  border:none;
+  border-radius:var(--radius);
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+/* ===== BUTTONS ===== */
+.btn{
+  border-radius:12px;
+  font-weight:500;
+}
+
+/* ===== PROFILE ===== */
+#profilEntreprise{
+  display:none;
+  max-width:480px;
+  margin:2rem auto;
+  padding:2rem;
+  animation:fadeSlide .4s ease;
+}
+
+@keyframes fadeSlide{
+  from{opacity:0; transform:translateY(-10px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.list-group-item{
+  border:none;
+  border-bottom:1px solid #eef2f7;
+}
+
+/* ===== ACTIONS ===== */
+.action-buttons{
+  display:flex;
+  justify-content:center;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin:2.5rem 0;
+}
+
+/* ===== SIGNATURE ===== */
+canvas{
+  background:#fff;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.badge{
+  border-radius:50px;
+  padding:.45rem .8rem;
+}
+.btn-logout {
+    background-color: #dc3545;  /* Rouge vif Bootstrap */
+    color: #fff;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.5rem 1.2rem;
+    box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.btn-logout i {
+    font-size: 1.1rem;
+}
+
+.btn-logout:hover {
+    background-color: #b02a37;  /* Rouge plus foncé au hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(220,53,69,0.4);
+    text-decoration: none;
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <h3>Bienvenue, {{ employeur.nom }}</h3>
+
+{% load static %}
+{% load static %}
+
+<div class="d-flex justify-content-end align-items-center gap-3 mb-4">
+    <a href="{% url 'logout' %}" class="btn btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Déconnexion
+    </a>
+
+    <div class="profile-wrapper">
+
+        <!-- 👤 BOUTON PROFIL (clic centre uniquement) -->
+        <button type="button"
+                id="btnProfil"
+                class="profile-btn"
+                title="Voir le profil">
+            {% if employeur and employeur.logo %}
+                <img src="{{ employeur.logo.url }}" class="profile-logo">
+            {% else %}
+                <img src="{% static 'images/default-logo.png' %}" class="profile-logo">
+            {% endif %}
+        </button>
+
+        <!-- ➕ UPLOAD LOGO -->
+        <form method="POST"
+              action="{% url 'profil_employeur' %}"
+              enctype="multipart/form-data"
+              class="upload-form">
+            {% csrf_token %}
+
+            <label for="logoInput" class="profile-plus">
+                <i class="bi bi-plus-lg"></i>
+            </label>
+
+            <input type="file"
+                   id="logoInput"
+                   name="logo"
+                   accept="image/png, image/jpeg"
+                   hidden
+                   onchange="this.form.submit()">
+        </form>
+
+    </div>
+</div>
+
+<style>
+.profile-wrapper {
+    position: relative;
+    width: 70px;
+    height: 70px;
+}
+
+/* Bouton profil */
+.profile-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.profile-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0078d7;
+}
+
+/* Icône + */
+.upload-form {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.profile-plus {
+    width: 26px;
+    height: 26px;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid white;
+    font-size: 16px;
+}
+
+.action-buttons {
+  margin-top: 2rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.35s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.action-btn i {
+  font-size: 1.4rem;
+}
+
+/* TRANSFERT */
+.btn-transfer {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #fff;
+}
+
+.btn-transfer:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+
+/* RÉFÉRENCE */
+.btn-reference {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+}
+
+.btn-reference:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(245, 158, 11, 0.35);
+  color: #fff;
+}
+
+/* HISTORIQUE */
+.btn-history {
+  background: linear-gradient(135deg, #111827, #374151);
+  color: #fff;
+}
+
+.btn-history:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(17, 24, 39, 0.35);
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #b3b7bd; /* gris pro */
+}
+
+.icon-ref {
+    color: #004bec; /* bleu pro */
+    font-size: 18px;
+}
+
+
+</style>
+
+
+
+
+  <!-- PROFIL ENTREPRISE -->
+  <div class="card shadow-sm" id="profilEntreprise">
+    <h5><i class="bi bi-building me-2"></i> Profil de l'entreprise</h5>
+    <div id="profilView">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Email :</strong> {{ employeur.email }}</li>
+        <li class="list-group-item"><strong>Téléphone :</strong> {{ employeur.telephone }}</li>
+        <li class="list-group-item"><strong>Adresse :</strong> {{ employeur.rue }}, {{ employeur.code_postal }}</li>
+        <li class="list-group-item"><strong>Province :</strong> {{ employeur.province }}</li>
+      </ul>
+      <button class="btn btn-outline-primary mt-3 w-100" id="btnEdit">
+        <i class="bi bi-pencil-square"></i> Modifier
+      </button>
+    </div>
+
+    <form id="profilEditForm" method="POST" action="{% url 'modifier_profil' employeur.id %}" style="display:none;">
+      {% csrf_token %}
+      <div class="mb-2"><label>Email</label><input type="email" name="email" class="form-control" value="{{ employeur.email }}" required></div>
+      <div class="mb-2"><label>Téléphone</label><input type="text" name="telephone" class="form-control" value="{{ employeur.telephone }}" required></div>
+      <div class="mb-2"><label>Rue</label><input type="text" name="rue" class="form-control" value="{{ employeur.rue }}" required></div>
+      <div class="mb-2"><label>Code postal</label><input type="text" name="code_postal" class="form-control" value="{{ employeur.code_postal }}" required></div>
+      <div class="mb-2"><label>Province</label><input type="text" name="province" class="form-control" value="{{ employeur.province }}" required></div>
+      <button type="submit" class="btn btn-success w-100 mt-2"><i class="bi bi-check2-circle"></i> Enregistrer</button>
+      <button type="button" class="btn btn-secondary w-100 mt-2" id="btnCancel">Annuler</button>
+    </form>
+  </div>
+
+<!-- BOUTONS D'ACTIONS -->
+<div class="d-flex justify-content-center flex-wrap gap-4 mb-5 action-buttons">
+
+  <a href="{% url 'envoyer_transfert' %}" class="btn action-btn btn-transfer">
+    <i class="bi bi-arrow-left-right"></i>
+    <span>Envoyer un transfert</span>
+  </a>
+
+  <a href="{% url 'envoyer_reference' %}" class="btn action-btn btn-reference">
+    <i class="bi bi-person-check"></i>
+    <span>Envoyer une référence</span>
+  </a>
+
+  <a href="{% url 'historique_employeur' %}" class="btn action-btn btn-history">
+    <i class="bi bi-clock-history"></i>
+    <span>Historique</span>
+  </a>
+
+</div>
+
+
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+<h5 class="section-title">
+    <i class="fa-solid fa-paper-plane icon-ref"></i>
+    Références envoyées
+</h5>
+
+<ul class="list-group mb-3 shadow-sm">
+  {% for r in references_envoyees %} 
+    {% if not r.supprime_pour_employeur %}
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div>
+        <strong>{{ r.nom_employe }} {{ r.prenom_employe }}</strong><br>
+        <small>Envoyée à <em>{{ r.nouvelle_entreprise.nom }}</em> le {{ r.date_reference|date:"d/m/Y" }}</small><br>
+        {% if r.message %}
+          <small class="text-dark fst-italic">Message : {{ r.message }}</small><br>
+        {% endif %}
+        {% if r.reponse_employeur %}
+          <p class="mt-2 text-primary"><strong>Réponse :</strong> {{ r.reponse_employeur }}</p>
+        {% else %}
+          <span class="badge bg-secondary mt-2">En attente de réponse</span>
+        {% endif %}
+      </div>
+      <form action="{% url 'supprimer_reference' r.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="delete_scope" value="one">
+        <button type="submit" class="btn btn-sm btn-outline-danger"
+                onclick="return confirm('Supprimer cette référence ?');">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </form>
+    </li>
+    {% endif %}
+  {% empty %}
+    <li class="list-group-item text-muted text-center">Aucune référence envoyée.</li>
+  {% endfor %}
+</ul>
+
+<h5 class="section-title">
+    <i class="fa-solid fa-inbox icon-ref"></i>
+    Références reçues
+</h5>
+
+<ul class="list-group mb-3 shadow-sm">
+  {% for r in references_recues %}
+    {% if not r.supprime_pour_employeur %}
+    <li class="list-group-item">
+      <strong>{{ r.nom_employe }} {{ r.prenom_employe }}</strong><br>
+      <small>Référence reçue de <em>{{ r.ancienne_entreprise.nom }}</em> le {{ r.date_reference|date:"d/m/Y" }}</small><br>
+      {% if r.message %}
+        <small class="text-dark fst-italic">Message : {{ r.message }}</small><br>
+      {% endif %}
+      <form action="{% url 'repondre_reference' r.id %}" method="post" class="mt-2">
+        {% csrf_token %}
+        <input type="text" name="reponse_employeur" class="form-control form-control-sm mb-2"
+               placeholder="Répondre à cette référence..." required>
+        <button type="submit" class="btn btn-sm btn-outline-primary">Envoyer</button>
+      </form>
+      {% if r.reponse_employeur %}
+        <p class="mt-2 text-success"><strong>Réponse :</strong> {{ r.reponse_employeur }}</p>
+      {% endif %}
+       <form action="{% url 'supprimer_reference' r.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="delete_scope" value="one">
+        <button type="submit" class="btn btn-sm btn-outline-danger"
+                onclick="return confirm('Supprimer cette référence ?');">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </form>
+    </li>
+    
+    {% endif %}
+  {% empty %}
+    <li class="list-group-item text-muted text-center">Aucune référence reçue.</li>
+  {% endfor %}
+</ul>
+
+
+
+
+<h5 class="section-title">
+    <i class="fa-solid fa-right-to-bracket icon-ref"></i>
+    Transferts reçus
+</h5>
+
+<ul class="list-group mb-3 shadow-sm">
+
+{% for t in transferts_recus %}
+{% if not t.supprime_par_destinataire %}
+
+<li class="list-group-item">
+
+  <strong>{{ t.nom_employe }} {{ t.prenom_employe }}</strong><br>
+  <small>
+    <!-- Date de naissance -->
+        {% if t.date_naissance %}
+          <small>Date de naissance : {{ t.date_naissance|date:"d/m/Y" }}</small><br>
+        {% endif %}
+
+        <!-- NAS (affiché seulement si étranger et NAS renseigné) -->
+        {% if t.statut_canadien == "etranger" and t.nas %}
+          <small>NAS : {{ t.nas }}</small><br>
+        {% endif %}
+    Transfert reçu de <em>{{ t.ancienne_entreprise.nom }}</em>
+    le {{ t.date_transfert|date:"d/m/Y" }}
+  </small><br>
+
+  {% if t.message %}
+    <small class="text-dark fst-italic">Message : {{ t.message }}</small><br>
+  {% endif %}
+
+  {% if t.statut == "en_attente" %}
+  <div class="mt-3">
+
+    <!-- ✅ ACCEPTER AVEC SIGNATURE -->
+    <button class="btn btn-sm btn-success"
+            data-bs-toggle="collapse"
+            data-bs-target="#acceptForm{{t.id}}">
+      Accepter
+    </button>
+
+    <div class="collapse mt-3" id="acceptForm{{t.id}}">
+      <form method="POST" action="{% url 'accepter_transfert' t.id %}">
+        {% csrf_token %}
+
+        <input type="text"
+               name="signature_nom"
+               class="form-control form-control-sm mb-2"
+               placeholder="Nom complet du responsable signataire"
+               required>
+
+        <p class="fw-semibold mb-1">
+          ✍️ Signature manuscrite (dessin souris / tactile)
+        </p>
+
+        <small class="text-muted d-block mb-2">
+          Cette signature électronique vaut engagement légal de l’entreprise.
+        </small>
+
+        <canvas id="signature-pad{{t.id}}"
+                width="300"
+                height="120"
+                style="border:1px solid #ccc;border-radius:6px;background:#fff;">
+        </canvas>
+
+        <input type="hidden" name="signature_data" id="signatureData{{t.id}}">
+
+        <div class="d-flex gap-2 mt-2">
+          <button type="button"
+        class="btn btn-sm btn-outline-secondary w-50"
+        onclick="clearSignature('{{ t.id }}')">
+  Effacer
+</button>
+
+<button type="submit"
+        class="btn btn-sm btn-success w-50"
+        onclick="saveSignature('{{ t.id }}')">
+  ✅ Accepter & signer
+</button>
+
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ❌ REFUSER -->
+    <button class="btn btn-sm btn-danger mt-2"
+            data-bs-toggle="collapse"
+            data-bs-target="#refusForm{{t.id}}">
+      Refuser
+    </button>
+
+    <div class="collapse mt-2" id="refusForm{{t.id}}">
+      <form action="{% url 'refuser_transfert' t.id %}" method="post">
+        {% csrf_token %}
+        <textarea name="motif_refus"
+                  rows="2"
+                  class="form-control form-control-sm"
+                  placeholder="Motif du refus..."
+                  required></textarea>
+        <button type="submit"
+                class="btn btn-sm btn-outline-danger mt-2 w-100">
+          Confirmer le refus
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  {% elif t.statut == "accepte" %}
+    <p class="text-success mt-2">
+      <strong>✅ Transfert accepté et signé électroniquement.</strong>
+    </p>
+
+  {% elif t.statut == "refuse" %}
+    <p class="text-danger mt-2">
+      <strong>❌ Refusé.</strong> Motif : {{ t.motif_refus }}
+    </p>
+  {% endif %}
+
+</li>
+
+{% endif %}
+{% empty %}
+<li class="list-group-item text-muted text-center">
+  Aucun transfert reçu.
+</li>
+{% endfor %}
+
+</ul>
+
+<h5 class="section-title">
+    <i class="fa-solid fa-share icon-ref"></i>
+    Transferts envoyés
+</h5>
+
+<ul class="list-group mb-3 shadow-sm">
+
+{% for t in transferts_envoyes %}
+{% if not t.supprime_par_expediteur %}
+
+<li class="list-group-item">
+
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <strong>{{ t.nom_employe }} {{ t.prenom_employe }}</strong><br>
+              <!-- Date de naissance -->
+        {% if t.date_naissance %}
+          <small>Date de naissance : {{ t.date_naissance|date:"d/m/Y" }}</small><br>
+        {% endif %}
+
+        <!-- NAS (affiché seulement si étranger et NAS renseigné) -->
+        {% if t.statut_canadien == "etranger" and t.nas %}
+          <small>NAS : {{ t.nas }}</small><br>
+        {% endif %}
+
+
+      <small>
+        Envoyé à <em>{{ t.nouvelle_entreprise.nom }}</em>
+        le {{ t.date_transfert|date:"d/m/Y" }}
+      </small><br>
+
+      {% if t.message %}
+        <small class="text-dark fst-italic">
+          Message : {{ t.message }}
+        </small><br>
+      {% endif %}
+
+      {% if t.statut == "en_attente" %}
+        <span class="badge bg-warning text-dark mt-2">En attente</span>
+      {% elif t.statut == "accepte" %}
+        <span class="badge bg-success mt-2">Accepté</span>
+      {% elif t.statut == "refuse" %}
+        <span class="badge bg-danger mt-2">
+          Refusé ({{ t.motif_refus }})
+        </span>
+      {% endif %}
+    </div>
+
+    <form action="{% url 'supprimer_transfert' t.id %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="delete_scope" value="one">
+      <button type="submit"
+              class="btn btn-sm btn-outline-danger"
+              onclick="return confirm('Supprimer ce transfert ?');">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </form>
+  </div>
+
+</li>
+{% endif %}
+{% empty %}
+<li class="list-group-item text-muted text-center">
+  Aucun transfert envoyé.
+</li>
+{% endfor %}
+
+</ul>
+
+<div class="card p-4 mb-5 shadow-sm">
+  <h5 class="section-title">
+    <i class="fa-solid fa-chart-line icon-ref"></i>
+    Activité mensuelle
+  </h5>
+
+  <canvas id="activityChart" height="100"></canvas>
+</div>
+
+
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById("btnProfil").addEventListener("click", () => {
+    const profil = document.getElementById("profilEntreprise");
+    profil.style.display = profil.style.display === "none" ? "block" : "none";
+  });
+
+  const btnEdit = document.getElementById("btnEdit");
+  const btnCancel = document.getElementById("btnCancel");
+  const profilView = document.getElementById("profilView");
+  const profilEditForm = document.getElementById("profilEditForm");
+
+  btnEdit.addEventListener("click", () => {
+    profilView.style.display = "none";
+    profilEditForm.style.display = "block";
+  });
+
+  btnCancel.addEventListener("click", () => {
+    profilEditForm.style.display = "none";
+    profilView.style.display = "block";
+  });
+
+  document.getElementById("btnProfil").addEventListener("click", function () {
+    document.getElementById("profil-details").classList.toggle("d-none");
+});
+
+function initSignature(id) {
+  const canvas = document.getElementById('signature-pad' + id);
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+
+  canvas.addEventListener('mousedown', () => drawing = true);
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!drawing) return;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+
+  canvas.addEventListener('touchstart', e => {
+    drawing = true;
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  canvas.addEventListener('touchmove', e => {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    e.preventDefault();
+  });
+}
+
+function saveSignature(id) {
+  const canvas = document.getElementById('signature-pad' + id);
+  document.getElementById('signatureData' + id).value = canvas.toDataURL();
+}
+
+function clearSignature(id) {
+  const canvas = document.getElementById('signature-pad' + id);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+document.querySelectorAll("canvas[id^='signature-pad']").forEach(c => {
+  const id = c.id.replace('signature-pad','');
+  initSignature(id);
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  if (typeof Chart === "undefined") {
+    console.error("Chart.js n'est pas chargé");
+    return;
+  }
+
+  const canvas = document.getElementById("activityChart");
+  if (!canvas) return;
+
+  const labels = window.activityLabels || [];
+  const referencesData = window.referencesData || [];
+  const transfertsData = window.transfertsData || [];
+
+  const ctx = canvas.getContext("2d");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Références envoyées",
+          data: referencesData,
+          backgroundColor: "rgba(13,110,253,0.75)",
+          borderRadius: 10
+        },
+        {
+          label: "Transferts envoyés",
+          data: transfertsData,
+          backgroundColor: "rgba(25,135,84,0.75)",
+          borderRadius: 10
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            font: {
+              size: 13,
+              weight: "600"
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: "#111827",
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff"
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+
+});
+
+
+
+
+</script>
+{% endblock %}

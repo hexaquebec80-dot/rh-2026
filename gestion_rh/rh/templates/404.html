@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur 404 - Page non trouvée</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .error-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+        .error-box h1 {
+            font-size: 80px;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        .error-box p {
+            font-size: 18px;
+            color: #333;
+        }
+        .contact {
+            margin-top: 25px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <h1>404</h1>
+        <p><strong>Page non trouvée</strong></p>
+        <p>Erreur : appelez le technicien de <strong>HexaQuébec</strong><br>
+           pour connecter la base de données.</p>
+        <p class="contact">📞 514 467 7377</p>
+        <a href="/" class="btn btn-primary mt-3">Retour à l'accueil</a>
+    </div>
+</body>
+</html>

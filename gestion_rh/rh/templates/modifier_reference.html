@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Modifier Référence{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Modifier Référence</h3>
+  <form method="POST">
+    {% csrf_token %}
+    <select name="employe_id" class="form-control mb-2">
+      {% for emp in employes %}
+        <option value="{{ emp.id }}" {% if reference.employe.id == emp.id %}selected{% endif %}>
+          {{ emp.nom }} {{ emp.prenom }}
+        </option>
+      {% endfor %}
+    </select>
+    <textarea name="message" class="form-control mb-2">{{ reference.message }}</textarea>
+    <input type="date" name="date_reference" value="{{ reference.date_reference|date:'Y-m-d' }}" class="form-control mb-2">
+    <button type="submit" class="btn btn-success">Modifier</button>
+  </form>
+</div>
+{% endblock %}

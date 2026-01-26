@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+{% block title %}Accueil | HexaQuébec{% endblock %}
+
+{% block css %}
+<style>
+/* ===== FOND GLOBAL ===== */
+body {
+  background: linear-gradient(135deg, #001f3f, #0078d7);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Effet lumineux */
+body::before {
+  content: "";
+  position: fixed;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(0,183,255,0.25), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  animation: glow 6s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+/* ===== LAYOUT ===== */
+.home-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  min-height: 100vh;
+  padding: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 992px) {
+  .home-wrapper {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+  }
+}
+
+/* ===== CARTE (GAUCHE) ===== */
+.card-container {
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border-radius: 25px;
+  padding: 2.8rem;
+  max-width: 520px;
+  width: 100%;
+  margin-left: auto; 
+  box-shadow: 0 18px 45px rgba(0,0,0,0.3);
+  animation: fadeIn 1s ease;
+  transform: translateX(-40px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-container h1 {
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 1rem;
+}
+
+.card-container p {
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+/* Boutons */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.9rem;
+}
+
+/* Support */
+.support-box {
+  margin-top: 2rem;
+  padding: 1.2rem;
+  border-radius: 16px;
+  background: rgba(0,120,215,0.1);
+  border: 1px solid rgba(0,120,215,0.25);
+}
+
+.support-header {
+  font-weight: 600;
+  color: #003366;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.support-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.support-link {
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  background: #fff;
+  color: #0078d7;
+  font-size: 0.9rem;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,120,215,0.15);
+}
+
+.support-link:hover {
+  background: #0078d7;
+  color: #fff;
+}
+
+/* ===== PUB / CONFIANCE (DROITE) ===== */
+.trust-box {
+  color: #ffffff;
+  max-width: 520px;
+}
+
+.trust-box h2 {
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.trust-item {
+  display: flex;
+  gap: 0.9rem;
+  margin-bottom: 1.1rem;
+  line-height: 1.45;
+}
+
+.trust-item i {
+  font-size: 1.4rem;
+  color: #00d4ff;
+}
+
+.law-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.12);
+  font-size: 0.9rem;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.qc-badge {
+  margin-top: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  border-radius: 14px;
+  background: rgba(0,212,255,0.18);
+  font-weight: 600;
+  border: 1px solid rgba(0,212,255,0.45);
+}
+.footer-brand {
+  font-size: 0.9rem;
+  color: #6b7280; /* gris pro */
+  text-align: center;
+  line-height: 1.6;
+}
+
+.footer-brand span {
+  color: #0078d7;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.footer-subtext {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+
+/* ===== PUB TEXTE FLUIDE (SANS CADRE) ===== */
+.trust-box {
+  color: #ffffff;
+  max-width: 520px;
+  animation: adSlide 1.2s ease-out forwards;
+}
+
+/* Titre */
+.trust-box h2 {
+  font-weight: 800;
+  margin-bottom: 1.8rem;
+  letter-spacing: 0.4px;
+  opacity: 0;
+  animation: textReveal 0.8s ease forwards;
+}
+
+/* ===== LIGNES PUB ===== */
+.trust-item {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+  opacity: 0;
+  animation: adFlow 0.8s ease forwards;
+}
+
+/* Décalage progressif (effet pub) */
+.trust-item:nth-child(2) { animation-delay: 0.2s; }
+.trust-item:nth-child(3) { animation-delay: 0.4s; }
+.trust-item:nth-child(4) { animation-delay: 0.6s; }
+
+.trust-item i {
+  font-size: 1.4rem;
+  color: #00d4ff;
+}
+
+/* ===== TEXTE LOI ===== */
+.law-box {
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  opacity: 0;
+  animation: adFlow 0.9s ease forwards;
+  animation-delay: 0.8s;
+}
+
+/* ===== BADGE QC (SANS FOND) ===== */
+.qc-badge {
+  margin-top: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  opacity: 0;
+  animation: badgeGlow 2.5s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.qc-badge i {
+  font-size: 1.2rem;
+  color: #00d4ff;
+}
+
+/* ===== ANIMATIONS ===== */
+
+/* Entrée générale */
+@keyframes adSlide {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Apparition texte douce */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Défilement type publicité */
+@keyframes adFlow {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Lueur discrète badge */
+@keyframes badgeGlow {
+  0%, 100% {
+    opacity: 0.6;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(0,212,255,0.7);
+  }
+}
+
+/* Permet de relancer l'animation */
+.trust-box.animate h2,
+.trust-box.animate .trust-item,
+.trust-box.animate .law-box,
+.trust-box.animate .qc-badge {
+  animation-play-state: running;
+}
+
+
+/* ===== PUB TEXTE FLUIDE (SANS CADRE) ===== */
+.trust-box {
+  color: #ffffff;
+  max-width: 520px;
+}
+
+/* Titre */
+.trust-box h2 {
+  font-weight: 800;
+  margin-bottom: 1.8rem;
+  letter-spacing: 0.4px;
+  opacity: 0;
+}
+
+/* Lignes pub */
+.trust-item {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+  opacity: 0;
+}
+
+.trust-item i {
+  font-size: 1.4rem;
+  color: #00d4ff;
+}
+
+/* Texte loi */
+.law-box {
+  margin-top: 1.4rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  opacity: 0;
+}
+
+/* Badge QC */
+.qc-badge {
+  margin-top: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  opacity: 0;
+}
+
+.qc-badge i {
+  font-size: 1.2rem;
+  color: #00d4ff;
+}
+
+/* ===== LECTURE DES ANIMATIONS ===== */
+.trust-box.play h2 {
+  animation: textReveal 0.8s ease forwards;
+}
+
+.trust-box.play .trust-item:nth-child(2) {
+  animation: adFlow 0.8s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.trust-box.play .trust-item:nth-child(3) {
+  animation: adFlow 0.8s ease forwards;
+  animation-delay: 0.4s;
+}
+
+.trust-box.play .trust-item:nth-child(4) {
+  animation: adFlow 0.8s ease forwards;
+  animation-delay: 0.6s;
+}
+
+.trust-box.play .law-box {
+  animation: adFlow 0.9s ease forwards;
+  animation-delay: 0.8s;
+}
+
+.trust-box.play .qc-badge {
+  animation: badgeGlow 2.5s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes textReveal {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes adFlow {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes badgeGlow {
+  0%,100% { opacity: 0.6; text-shadow: none; }
+  50% { opacity: 1; text-shadow: 0 0 12px rgba(0,212,255,0.7); }
+}
+
+
+/* ===== TITRE PREMIUM ===== */
+.card-container h1 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+
+
+
+  /* Effet luxe */
+  
+}
+
+/* Animation douce */
+.card-container h1 {
+  animation: titleFade 1.2s ease-out;
+}
+
+@keyframes titleFade {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-wrapper">
+
+  <!-- ===== GAUCHE : CARTE ===== -->
+  <div class="card-container">
+    
+    <h1>Bienvenue sur la plateforme RH</h1>
+    <p>Collaborez, échangez des références et gérez vos transferts d’employés avec efficacité.</p>
+
+    <a href="{% url 'register' %}" class="btn btn-outline-primary w-100 mb-3">
+      <i class="bi bi-person-plus"></i> Créer un compte
+    </a>
+
+    <a href="{% url 'login' %}" class="btn btn-outline-success w-100">
+      <i class="bi bi-box-arrow-in-right"></i> Se connecter
+    </a>
+
+      <div class="support-box">
+  <div class="support-header">
+    <i class="bi bi-headset"></i>
+    Besoin d’aide ?
+  </div>
+
+  <p class="support-desc">
+    Notre équipe <strong>HexaQuébec</strong> est disponible pour vous accompagner.
+  </p>
+
+  <div class="support-actions">
+    <a href="tel:+15144677377" class="support-link">
+      <i class="bi bi-telephone-fill"></i>
+      514-467-7377
+    </a>
+
+    <a href="mailto:hexaquebec80@gmail.com" class="support-link">
+      <i class="bi bi-envelope-fill"></i>
+      hexaquebec80@gmail.com
+    </a>
+  </div>
+</div>
+
+
+    <div class="footer-brand mt-4">
+      © 2025 <span>HexaQuébec</span> – Tous droits réservés.
+    </div>
+  </div>
+
+
+
+  <!-- ===== DROITE : PUB / CONFIANCE ===== -->
+  <div class="trust-box">
+    <h2>Plateforme conforme aux normes du Québec</h2>
+
+    <div class="trust-item">
+      <i class="bi bi-shield-check"></i>
+      <div><strong>Loi 25</strong><br>Protection des renseignements personnels</div>
+    </div>
+
+    <div class="trust-item">
+      <i class="bi bi-lock-fill"></i>
+      <div><strong>Sécurité avancée</strong><br>Données chiffrées et traçabilité complète</div>
+    </div>
+
+    <div class="trust-item">
+      <i class="bi bi-arrow-left-right"></i>
+      <div><strong>Transferts encadrés</strong><br>Conformes au cadre légal québécois</div>
+    </div>
+
+    <div class="law-box">
+      • Loi 25<br>
+      • Code civil du Québec<br>
+      • Normes du travail<br>
+      • Bonnes pratiques RH
+    </div>
+
+    <div class="law-box">
+     "⚖️ Tous les transferts sont considérés comme une embauche officielle",
+"    acceptée par l'employeur destinataire.",
+
+    </div>
+    <div class="qc-badge">
+      <i class="bi bi-patch-check-fill"></i>
+      Conforme Québec
+    </div>
+  </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const box = document.querySelector(".trust-box");
+
+  if (!box) return;
+
+  function playAd() {
+    box.classList.remove("play");
+    void box.offsetHeight; // reset animation
+    box.classList.add("play");
+  }
+
+  // Première lecture
+  playAd();
+
+  // Relance toutes les 10 secondes
+  setInterval(playAd, 10000);
+});
+</script>
+
+
+{% endblock %}
+
+
+
+
+

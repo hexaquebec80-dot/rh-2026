@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  .history-title {
+    font-weight: 700;
+    color: #ffff;
+  }
+
+  .history-card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  }
+
+  .history-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f1f1;
+    transition: background 0.2s ease;
+  }
+
+  .history-item:hover {
+    background: #f8fbff;
+  }
+
+  .history-name {
+    font-weight: 600;
+    color: #004a99;
+  }
+
+  .history-meta {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .badge-status {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 12px;
+  }
+
+  .badge-success { background: #d4edda; color: #155724; }
+  .badge-warning { background: #fff3cd; color: #856404; }
+  .badge-danger  { background: #f8d7da; color: #721c24; }
+  .badge-info    { background: #e2e3ff; color: #383d7c; }
+
+  .section-icon {
+    font-size: 1.2rem;
+    color: #0078d7;
+    margin-right: 6px;
+  }
+</style>
+
+<div class="container mt-4 mb-5">
+
+  <!-- 🔙 RETOUR -->
+  <div class="mb-3">
+    <a href="{% url 'profil_employeur' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Retour au profil
+    </a>
+  </div>
+
+  <h3 class="history-title mb-4">
+    <i class="bi bi-clock-history"></i>
+    Historique complet
+  </h3>
+
+  <!-- 🔹 HISTORIQUE TRANSFERTS -->
+  <div class="card history-card mb-4">
+    <div class="card-header fw-bold bg-white">
+      <i class="bi bi-arrow-left-right section-icon"></i>
+      Transferts
+    </div>
+
+    {% for t in transferts %}
+      <div class="history-item">
+        <div class="history-name">
+          {{ t.nom_employe }} {{ t.prenom_employe }}
+        </div>
+
+        <div class="history-meta">
+          {{ t.ancienne_entreprise.nom }} ➜ {{ t.nouvelle_entreprise.nom }}<br>
+          {{ t.date_transfert|date:"d/m/Y" }}
+
+          {% if t.statut == "accepte" %}
+            <span class="badge badge-status badge-success ms-2">Accepté</span>
+          {% elif t.statut == "refuse" %}
+            <span class="badge badge-status badge-danger ms-2">Refusé</span>
+          {% else %}
+            <span class="badge badge-status badge-warning ms-2">En attente</span>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="p-3 text-muted text-center">
+        Aucun transfert enregistré
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- 🔹 HISTORIQUE RÉFÉRENCES -->
+  <div class="card history-card mb-4">
+    <div class="card-header fw-bold bg-white">
+      <i class="bi bi-person-check section-icon"></i>
+      Références
+    </div>
+
+    {% for r in references %}
+      <div class="history-item">
+        <div class="history-name">
+          {{ r.nom_employe }} {{ r.prenom_employe }}
+        </div>
+
+        <div class="history-meta">
+          {{ r.ancienne_entreprise.nom }} ➜ {{ r.nouvelle_entreprise.nom }}<br>
+          {{ r.date_reference|date:"d/m/Y" }}
+
+          {% if r.reponse_employeur %}
+            <span class="badge badge-status badge-success ms-2">Répondue</span>
+          {% else %}
+            <span class="badge badge-status badge-info ms-2">Sans réponse</span>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="p-3 text-muted text-center">
+        Aucune référence enregistrée
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

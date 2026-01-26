@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}Transfert d'Employé | HexaQuébec{% endblock %}
+
+{% block content %}
+<style>
+/* ===== BACKGROUND ===== */
+
+
+/* ===== CARD ===== */
+.transfer-card {
+  max-width: 650px;
+  margin: auto;
+  background: linear-gradient(145deg, #ffffff, #f0f6ff);
+  border-radius: 24px;
+  padding: 2.8rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+  animation: slideFade 0.8s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bande décorative */
+.transfer-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(135deg, #007bff, #6610f2);
+}
+
+/* Animation */
+@keyframes slideFade {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== TITRE ===== */
+.transfer-card h3 {
+  font-weight: 800;
+  color: #b02a37;
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.6px;
+}
+
+/* ===== LABELS ===== */
+.form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.3rem;
+}
+
+/* ===== INPUTS ===== */
+.form-control {
+  border-radius: 14px;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.25s ease;
+}
+
+.form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2);
+}
+
+/* ===== TEXTAREA ===== */
+textarea.form-control {
+  resize: none;
+}
+
+/* ===== BUTTON ===== */
+.btn-transfer {
+  background: linear-gradient(135deg, #0d6efd,  #0d6efd);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-weight: 700;
+  padding: 0.7rem;
+  letter-spacing: 0.4px;
+  box-shadow: 0 10px 25px rgba(220, 53, 69, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-transfer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(220, 53, 69, 0.45);
+}
+
+/* ===== ALERTS ===== */
+.alert {
+  border-radius: 14px;
+  font-weight: 500;
+  animation: slideFade 0.5s ease;
+}
+
+/* ===== ICON INPUT ===== */
+.input-group-text {
+  background: #fff;
+  border-radius: 14px 0 0 14px;
+  border: 1px solid #e5e7eb;
+}
+</style>
+
+<div class="transfer-bg">
+  <div class="transfer-card">
+
+    <h3>
+      <i class="bi bi-arrow-left-right me-2"></i>
+      Transfert d’Employé
+    </h3>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" autocomplete="off">
+      {% csrf_token %}
+
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Nom de l’employé</label>
+          <input type="text" name="nom_employe" class="form-control" placeholder="Kamara" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Prénom de l’employé</label>
+          <input type="text" name="prenom_employe" class="form-control" placeholder="Diambere" required>
+        </div>
+
+<!-- Date de naissance -->
+    <div class="col-md-6">
+      <label class="form-label">Date de naissance</label>
+      <input type="date" name="date_naissance" class="form-control" 
+             value="{{ employeur.date_naissance|date:'Y-m-d' }}" required>
+    </div>
+
+    <!-- Statut -->
+    <div class="col-md-6">
+      <label class="form-label">Statut de l’employé</label>
+      <select name="statut_canadien" class="form-control" id="statutCanadien" required>
+        <option value="">-- Sélectionner --</option>
+        <option value="canadien" {% if employeur.statut_canadien == 'canadien' %}selected{% endif %}>Canadien / Résident permanent</option>
+        <option value="etranger" {% if employeur.statut_canadien == 'etranger' %}selected{% endif %}>Autre nationalité</option>
+      </select>
+    </div>
+
+    <!-- NAS -->
+    <div class="col-md-6 {% if employeur.statut_canadien != 'etranger' %}d-none{% endif %}" id="nasField">
+      <label class="form-label">Numéro d’assurance sociale (NAS)</label>
+      <input type="password" name="nas" id="nasInput" class="form-control"
+             value="{{ employeur.nas }}" placeholder="123 456 789">
+      <small class="text-muted">🔒 Donnée protégée – conforme à la Loi 25</small>
+    </div>
+
+   
+
+
+
+        <div class="col-md-6">
+          <label class="form-label">Poste occupé</label>
+          <input type="text" name="poste" class="form-control" placeholder="Technicien RH" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Numéro employé</label>
+          <input type="text" name="numero_employe" class="form-control" placeholder="EMP-1234" required>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label">Nouvel employeur</label>
+          <input type="text" name="nouvelle_entreprise" class="form-control" placeholder="TechnoSoud Inc." required>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label">Date du transfert</label>
+          <input type="date" name="date_transfert" class="form-control" required>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label">Message (facultatif)</label>
+          <textarea name="message" rows="4" class="form-control" placeholder="Raison ou détails du transfert..."></textarea>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn btn-transfer w-100 mt-4">
+        <i class="bi bi-send-fill me-1"></i>
+        Envoyer le Transfert
+      </button>
+    </form>
+
+  </div>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const statut = document.getElementById("statutCanadien");
+  const nasField = document.getElementById("nasField");
+  const nasInput = document.getElementById("nasInput");
+
+  statut.addEventListener("change", () => {
+    if (statut.value === "etranger") {
+      nasField.classList.remove("d-none");
+      nasInput.required = true;
+    } else {
+      nasField.classList.add("d-none");
+      nasInput.required = false;
+      nasInput.value = "";
+    }
+  });
+</script>
+
+
+{% endblock %}

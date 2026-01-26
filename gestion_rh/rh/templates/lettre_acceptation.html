@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    padding: 40px;
+    background-color: #f9f9f9;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Fleurs décoratives */
+  body::before, body::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-image: url('https://i.ibb.co/0mJxP0Q/flower.png'); /* URL fleur décorative */
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.2;
+    z-index: 0;
+  }
+  body::before {
+    top: 20px;
+    left: 20px;
+  }
+  body::after {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .logo img {
+    height: 80px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #34495e;
+  }
+
+  .content p {
+    margin-bottom: 15px;
+  }
+
+  .highlight {
+    color: #27ae60;
+    font-weight: 700;
+  }
+
+  .signature {
+    margin-top: 60px;
+    text-align: center;
+  }
+
+  .signature img {
+    width: 220px;
+    margin-top: 10px;
+    border-bottom: 1px solid #000;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 20px;
+    width: calc(100% - 80px);
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  
+
+  <h2>Lettre officielle d’acceptation de transfert</h2>
+
+  <div class="content">
+    <p>Nous confirmons par la présente que la demande de transfert de :</p>
+
+    <p>
+      <strong>{{ transfert.nom_employe }} {{ transfert.prenom_employe }}</strong><br>
+      Poste : {{ transfert.poste }}<br>
+      Numéro employé : {{ transfert.numero_employe }}<br>
+      
+      {% if transfert.date_naissance %}
+        Date de naissance : {{ transfert.date_naissance|date:"d/m/Y" }}<br>
+      {% endif %}
+      
+      {% if transfert.statut_canadien == "etranger" and transfert.nas %}
+        NAS : ... ... {{ transfert.nas|slice:"-3:" }}<br>
+      {% endif %}
+    </p>
+
+    <p>
+      a été officiellement <strong class="highlight">ACCEPTÉE</strong> par l’entreprise
+      <strong>{{ entreprise.nom }}</strong>.
+    </p>
+
+    <p>
+      Cette acceptation prend effet à compter du
+      <strong>{{ transfert.date_transfert|date:"d/m/Y" }}</strong>.
+    </p>
+
+    <!-- SIGNATURE -->
+    <div class="signature">
+      <p><strong>Signature électronique :</strong></p>
+      <p>{{ signature_nom }}</p>
+
+      {% if transfert.signature_image %}
+        <img src="{{ transfert.signature_image }}" alt="Signature électronique">
+      {% endif %}
+
+      <p>{{ entreprise.nom }}</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Document signé électroniquement le {{ date_signature|date:"d/m/Y H:i" }}
+</div>
+
+</body>
+</html>

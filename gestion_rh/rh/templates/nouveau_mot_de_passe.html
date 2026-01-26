@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Nouveau mot de passe{% endblock %}
+
+{% block content %}
+<div class="center-wrapper">
+  <div class="card animated-card">
+    <h2>Nouveau mot de passe</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label>Nouveau mot de passe</label>
+        <input type="password" name="password1" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" name="password2" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-danger w-100">Changer le mot de passe</button>
+    </form>
+  </div>
+</div>
+
+<style>
+.center-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+
+  padding: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.animated-card {
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #ff4b5c;
+  box-shadow: 0 0 5px rgba(255, 75, 92, 0.5);
+  outline: none;
+}
+
+.btn-danger {
+  border-radius: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, #ff4b5c, #ff6b81);
+  border: none;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #ff6b81, #ff4b5c);
+  transform: translateY(-2px);
+}
+</style>
+{% endblock %}

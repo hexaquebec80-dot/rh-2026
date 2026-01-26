@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Mot de passe oublié | HexaQuébec{% endblock %}
+
+{% block css %}
+<style>
+body {
+  background: linear-gradient(135deg, #001f3f, #0078d7);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Effet lumineux animé d’arrière-plan */
+body::before {
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.12), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 6s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Conteneur central */
+.center-wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Carte principale */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: slideDown 1s ease forwards;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 120, 215, 0.3);
+}
+
+@keyframes slideDown {
+  0% { opacity: 0; transform: translateY(-50px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Titres */
+.card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 1rem;
+}
+
+/* Paragraphe */
+.card p {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Champ input */
+.form-control {
+  border-radius: 10px;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.form-control:focus {
+  border-color: #0078d7;
+  box-shadow: 0 0 8px rgba(0, 120, 215, 0.3);
+}
+
+/* Bouton */
+.btn-danger {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff3b3b, #c60000);
+  border: none;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+.btn-danger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+}
+
+/* Lien retour */
+.card a {
+  color: #0078d7;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.card a:hover {
+  color: #005bb5;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="center-wrapper">
+  <div class="card">
+    <h2>Mot de passe oublié 🔒</h2>
+    <p>Veuillez entrer votre <strong>adresse e-mail</strong> ou votre <strong>numéro de téléphone</strong> pour recevoir un code de vérification.</p>
+    
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-3 text-start">
+        <label class="form-label">Email ou téléphone</label>
+        <input type="text" name="identifiant" class="form-control" placeholder="ex: entreprise@exemple.com ou 5815551234" required>
+      </div>
+      <button type="submit" class="btn btn-danger w-100 mt-3">Envoyer le code</button>
+    </form>
+
+    <p class="mt-4 mb-0" style="font-size:0.9rem;">
+      <a href="{% url 'login' %}">← Retour à la connexion</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
