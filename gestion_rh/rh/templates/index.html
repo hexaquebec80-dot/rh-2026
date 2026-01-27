@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Accueil | HexaQuébec{% endblock %}
 
 {% block css %}
@@ -442,12 +443,67 @@ body::before {
     transform: translateY(0);
   }
 }
+.header-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+}
+
+/* LOGO */
+.header-logo img {
+  height: 160px;              /* plus grand sur desktop */
+  width: auto;
+  max-width: 100%;
+  border-radius: 10px;
+ 
+  transition: transform 0.3s ease;
+}
+
+.header-logo img:hover {
+  transform: scale(1.06);
+  cursor: pointer;
+}
+
+/* 📱 TABLET */
+@media (max-width: 1024px) {
+  .header-logo img {
+    height: 100px;
+  }
+}
+
+/* 📱 MOBILE */
+@media (max-width: 600px) {
+  .header-logo {
+    top: 12px;
+    left: 12px;
+  }
+
+  .header-logo img {
+    height: 100px;
+  }
+}
+
+
 
 
 </style>
 {% endblock %}
 
+
+
+
+
 {% block content %}
+
+<header class="header-logo ">
+    <div class="logo">
+        <img src="{% static 'rh/images/RHQuebec-.png' %}" alt="RHQuebec">
+    </div>
+</header>
+
+
+
 <div class="home-wrapper">
 
   <!-- ===== GAUCHE : CARTE ===== -->
@@ -522,8 +578,8 @@ body::before {
     </div>
 
     <div class="law-box">
-     "⚖️ Tous les transferts sont considérés comme une embauche officielle",
-"    acceptée par l'employeur destinataire.",
+     "⚖️ Tous les transferts sont considérés comme une embauche officielle,
+   acceptée par l'employeur destinataire."
 
     </div>
     <div class="qc-badge">
