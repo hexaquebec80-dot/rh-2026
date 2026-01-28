@@ -1057,3 +1057,15 @@ def historique_employeur(request):
 
 def choisir_adresse(request):
     return render(request, 'choisir_adresse.html')
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+send_mail(
+    "Test Render",
+    "Email OK depuis Render",
+    settings.DEFAULT_FROM_EMAIL,
+    ["tonemail@gmail.com"],
+    fail_silently=False,
+)
