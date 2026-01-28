@@ -135,6 +135,37 @@
   }
 }
 
+
+/* ===========================
+   📱 FIX MOBILE – LOGIN CARD
+   =========================== */
+@media (max-width: 768px) {
+
+  .login-card {
+    max-width: 60%;          /* utilise toute la largeur */
+    width: 100%;
+    padding: 1.8rem;          /* plus confortable */
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+  }
+
+  .login-card h4 {
+    font-size: 1.25rem;       /* titre plus lisible */
+    margin-bottom: 1.3rem;
+  }
+
+  .form-control {
+    font-size: 1rem;
+    padding: 0.7rem 1rem;     /* inputs plus grands */
+  }
+
+  .btn-login {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 16px;
+  }
+}
+
 </style>
 {% if messages %}
   <div class="alert-container">

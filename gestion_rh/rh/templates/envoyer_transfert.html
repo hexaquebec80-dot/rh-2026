@@ -101,6 +101,37 @@ textarea.form-control {
   border-radius: 14px 0 0 14px;
   border: 1px solid #e5e7eb;
 }
+
+/* ===========================
+   📱 FIX MOBILE – TRANSFER CARD
+   =========================== */
+@media (max-width: 768px) {
+
+  .transfer-card {
+    max-width: 70%;          /* prend toute la largeur */
+    margin: 0.8rem auto;      /* respire sans déborder */
+    padding: 1.4rem;          /* réduit le padding */
+    border-radius: 18px;      /* plus fin sur mobile */
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .transfer-card h3 {
+    font-size: 1.1rem;        /* titre plus compact */
+    margin-bottom: 1.2rem;
+  }
+
+  .form-control {
+    font-size: 0.95rem;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .btn-transfer {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+    border-radius: 14px;
+  }
+}
+
 </style>
 
 <div class="transfer-bg">
