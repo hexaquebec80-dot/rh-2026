@@ -762,7 +762,6 @@ def repondre_reference(request, id):
         messages.success(request, "Réponse envoyée avec succès ✅")
         return redirect('profil_employeur')
 
-
 def accepter_transfert(request, id):
 
     if request.method != "POST":
@@ -775,26 +774,26 @@ def accepter_transfert(request, id):
         messages.warning(request, "Ce transfert a déjà été accepté.")
         return redirect("profil_employeur")
 
-    # 🔹 Signature
+    # 🔹 Récupération signature
     signature_nom = request.POST.get("signature_nom")
-    signature_image = request.POST.get("signature_data")
+    signature_image = request.POST.get("signature_data")  # base64 canvas
 
     if not signature_nom or not signature_image:
         messages.error(request, "La signature est obligatoire pour accepter le transfert.")
         return redirect("profil_employeur")
 
-    # 🔹 Mise à jour
+    # 🔹 Mise à jour du transfert
     t.statut = "accepte"
     t.signature_nom = signature_nom
     t.signature_image = signature_image
     t.date_signature = timezone.now()
     t.save()
 
-    # 🔹 Génération PDF
+    # 🔹 Génération du PDF
     pdf_buffer = generer_pdf_transfert(t)
     pdf_buffer.seek(0)
 
-    # 🔹 Email
+    # 🔹 Email avec PDF
     subject = f"✅ Acceptation officielle de transfert – {t.nom_employe} {t.prenom_employe}"
 
     body = f"""
@@ -1058,4 +1057,3 @@ def historique_employeur(request):
 
 def choisir_adresse(request):
     return render(request, 'choisir_adresse.html')
-
