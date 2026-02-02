@@ -79,18 +79,35 @@ class Employe(models.Model):
 
 
 class Transfert(models.Model):
+
+    TYPE_OPERATION_CHOICES = [
+        ("transfert", "Transfert"),
+        ("embauche", "Embauche"),
+    ]
+
     STATUT_CHOICES = [
         ("canadien", "Canadien / Résident permanent"),
         ("etranger", "Autre nationalité"),
     ]
 
+    # 🔹 NOUVEAU CHAMP
+    type_operation = models.CharField(
+        max_length=10,
+        choices=TYPE_OPERATION_CHOICES,
+        default="transfert"
+    )
+
     nom_employe = models.CharField(max_length=100)
     prenom_employe = models.CharField(max_length=100)
     poste = models.CharField(max_length=150)
-    numero_employe = models.CharField(max_length=50)
+
+    numero_employe = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
 
     date_naissance = models.DateField(null=True, blank=True)
-
 
     statut_canadien = models.CharField(
         max_length=20,
@@ -105,10 +122,15 @@ class Transfert(models.Model):
     )
 
     ancienne_entreprise = models.ForeignKey(
-        Employeur, on_delete=models.CASCADE, related_name="transferts_envoyes"
+        Employeur,
+        on_delete=models.CASCADE,
+        related_name="transferts_envoyes"
     )
+
     nouvelle_entreprise = models.ForeignKey(
-        Employeur, on_delete=models.CASCADE, related_name="transferts_recus"
+        Employeur,
+        on_delete=models.CASCADE,
+        related_name="transferts_recus"
     )
 
     date_transfert = models.DateField()
@@ -126,15 +148,35 @@ class Transfert(models.Model):
         ],
         default="en_attente",
     )
+
     motif_refus = models.TextField(blank=True, null=True)
 
     def clean(self):
-        """Validation métier NAS"""
+        """Validation métier"""
+        # NAS obligatoire si étranger
         if self.statut_canadien == "etranger" and not self.nas:
-            raise ValidationError("Le NAS est obligatoire pour une autre nationalité.")
+            raise ValidationError(
+                {"nas": "Le NAS est obligatoire pour une autre nationalité."}
+            )
+
+        # Numéro employé obligatoire uniquement pour un transfert
+        if self.type_operation == "transfert" and not self.numero_employe:
+            raise ValidationError(
+                {"numero_employe": "Le numéro employé est obligatoire pour un transfert."}
+            )
+
+        # Numéro employé interdit pour une embauche
+        if self.type_operation == "embauche" and self.numero_employe:
+            raise ValidationError(
+                {"numero_employe": "Le numéro employé ne doit pas être renseigné pour une embauche."}
+            )
 
     def __str__(self):
-        return f"{self.nom_employe} {self.prenom_employe} ➝ {self.nouvelle_entreprise.nom}"
+        return (
+            f"{self.nom_employe} {self.prenom_employe} "
+            f"({self.get_type_operation_display()}) ➝ "
+            f"{self.nouvelle_entreprise.nom}"
+        )
 
 
 class Reference(models.Model):

@@ -306,6 +306,20 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+
+  const typeOp = document.getElementById("type_operation");
+const numeroInput = document.getElementById("numero_employe");
+
+typeOp.addEventListener("change", function () {
+  if (this.value === "embauche") {
+    numeroInput.value = "Embauche";
+  }
+
+  if (this.value === "transfert") {
+    numeroInput.value = "E"; // l’utilisateur complète ou tu complètes plus tard
+  }
+});
+
   </script>
   
   {% endblock %}

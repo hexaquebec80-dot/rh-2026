@@ -100,11 +100,11 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label">Nom de l’employé *</label>
-            <input type="text" name="nom_employe" class="form-control" placeholder="Ex: Kamara" required>
+            <input type="text" name="nom_employe" class="form-control" placeholder="Nom" required>
           </div>
           <div class="col-md-6">
             <label class="form-label">Prénom de l’employé *</label>
-            <input type="text" name="prenom_employe" class="form-control" placeholder="Ex: Diambere" required>
+            <input type="text" name="prenom_employe" class="form-control" placeholder="Prenom" required>
           </div>
         </div>
 
@@ -115,9 +115,17 @@
             <input type="text" name="poste" class="form-control" placeholder="Ex: Technicien RH" required>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Numéro d’employé *</label>
-            <input type="text" name="numero_employe" class="form-control" placeholder="EMP-12345" required>
-          </div>
+  <label class="form-label">Numéro d’employé *</label>
+  <input
+    type="text"
+    name="numero_employe"
+    class="form-control"
+    placeholder="EMP-12345 / 123456 / A-9087"
+    required
+    autocomplete="off"
+  >
+</div>
+
         </div>
 
         <!-- Entreprise de réception -->

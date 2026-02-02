@@ -61,7 +61,9 @@ class EmployeAdmin(admin.ModelAdmin):
 
 @admin.register(Transfert)
 class TransfertAdmin(admin.ModelAdmin):
+
     list_display = (
+        "type_operation",          # ✅ AJOUTÉ
         "nom_employe",
         "prenom_employe",
         "poste",
@@ -75,6 +77,7 @@ class TransfertAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        "type_operation",          # ✅ AJOUTÉ
         "statut_canadien",
         "ancienne_entreprise",
         "nouvelle_entreprise",

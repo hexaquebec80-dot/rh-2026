@@ -332,7 +332,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Employeur, Transfert
 
-
 def envoyer_transfert(request):
     employeur_id = request.session.get("employeur_id")
     if not employeur_id:
@@ -342,10 +341,12 @@ def envoyer_transfert(request):
     employeur_connecte = get_object_or_404(Employeur, id=employeur_id)
 
     if request.method == "POST":
+        # 🔹 Données POST
+        type_operation = request.POST.get("type_operation")
         nom_employe = request.POST.get("nom_employe", "").strip()
         prenom_employe = request.POST.get("prenom_employe", "").strip()
         poste = request.POST.get("poste", "").strip()
-        numero_employe = request.POST.get("numero_employe", "").strip().upper()
+        numero_employe = request.POST.get("numero_employe", "").strip()
         nouvelle_entreprise_nom = request.POST.get("nouvelle_entreprise", "").strip()
         date_transfert_str = request.POST.get("date_transfert", "")
         date_naissance_str = request.POST.get("date_naissance", "")
@@ -354,26 +355,42 @@ def envoyer_transfert(request):
         message_text = request.POST.get("message", "").strip()
 
         # 🔴 Validation de base
-        if not all([nom_employe, prenom_employe, poste, numero_employe,
-                    nouvelle_entreprise_nom, date_transfert_str,
-                    date_naissance_str, statut_canadien]):
+        if not all([
+            type_operation, nom_employe, prenom_employe, poste,
+            nouvelle_entreprise_nom, date_transfert_str,
+            date_naissance_str, statut_canadien
+        ]):
             messages.error(request, "❌ Tous les champs obligatoires doivent être remplis.")
             return redirect("envoyer_transfert")
 
-        # 🔴 NAS obligatoire si autre nationalité
+        # 🔴 NAS obligatoire si étranger
         if statut_canadien == "etranger" and not nas:
             messages.error(request, "❌ Le NAS est obligatoire pour une autre nationalité.")
             return redirect("envoyer_transfert")
 
-        # 🔴 Format numéro employé
-        if not re.fullmatch(r"EMP-\d{4}", numero_employe):
-            messages.error(request, "❌ Format numéro employé invalide (EMP-1234).")
+        # 🔴 Gestion numéro employé
+        if type_operation == "embauche":
+            numero_employe = None
+
+        elif type_operation == "transfert":
+            if not numero_employe:
+                messages.error(
+                    request,
+                    "❌ Le numéro employé est obligatoire pour un transfert."
+                )
+                return redirect("envoyer_transfert")
+
+            if Transfert.objects.filter(numero_employe=numero_employe).exists():
+                messages.error(
+                    request,
+                    "❌ Numéro employé déjà utilisé."
+                )
+                return redirect("envoyer_transfert")
+        else:
+            messages.error(request, "❌ Type d’opération invalide.")
             return redirect("envoyer_transfert")
 
-        if Transfert.objects.filter(numero_employe=numero_employe).exists():
-            messages.error(request, "❌ Numéro employé déjà utilisé.")
-            return redirect("envoyer_transfert")
-
+        # 🔴 Conversion des dates
         try:
             date_transfert = datetime.strptime(date_transfert_str, "%Y-%m-%d").date()
             date_naissance = datetime.strptime(date_naissance_str, "%Y-%m-%d").date()
@@ -381,6 +398,21 @@ def envoyer_transfert(request):
             messages.error(request, "❌ Format de date invalide.")
             return redirect("envoyer_transfert")
 
+        # 🔴 Vérification âge (16–65 ans)
+        today = date.today()
+        age = today.year - date_naissance.year - (
+            (today.month, today.day) < (date_naissance.month, date_naissance.day)
+        )
+
+        if age < 16 or age > 65:
+            messages.error(
+                request,
+                "❌ L’âge de l’employé doit être compris entre 16 et 65 ans. "
+                "Veuillez nous contacter directement pour un traitement spécial."
+            )
+            return redirect("envoyer_transfert")
+
+        # 🔴 Entreprise destinataire
         try:
             nouvelle_entreprise = Employeur.objects.get(nom=nouvelle_entreprise_nom)
         except Employeur.DoesNotExist:
@@ -396,6 +428,7 @@ def envoyer_transfert(request):
             nom_employe=nom_employe,
             prenom_employe=prenom_employe,
             poste=poste,
+            type_operation=type_operation,
             numero_employe=numero_employe,
             date_naissance=date_naissance,
             statut_canadien=statut_canadien,
@@ -406,7 +439,7 @@ def envoyer_transfert(request):
             message=message_text,
         )
 
-        messages.success(request, "✅ Transfert envoyé avec succès.")
+        messages.success(request, "✅ Opération enregistrée avec succès.")
         return redirect("profil_employeur")
 
     entreprises = Employeur.objects.exclude(id=employeur_connecte.id)
@@ -415,8 +448,6 @@ def envoyer_transfert(request):
         "employeur_connecte": employeur_connecte,
         "entreprises": entreprises,
     })
-
-
 
 
 def envoyer_reference(request):
@@ -445,18 +476,21 @@ def envoyer_reference(request):
             numero_employe,
             entreprise_reception_nom
         ]):
-            messages.error(request, "❌ Tous les champs obligatoires doivent être remplis.")
-            return redirect("envoyer_reference")
-
-        # 🔴 FORMAT STRICT : EMP-XXXX (4 chiffres EXACTS)
-        if not re.fullmatch(r"EMP-\d{4}", numero_employe):
             messages.error(
                 request,
-                "❌ Numéro employé invalide. Format requis : EMP-1234 (4 chiffres obligatoires)."
+                "❌ Tous les champs obligatoires doivent être remplis."
             )
             return redirect("envoyer_reference")
 
-        # 🔴 NUMÉRO DÉJÀ UTILISÉ (référence)
+        # 🔴 Numéro employé obligatoire (sans format strict)
+        if not numero_employe:
+            messages.error(
+                request,
+                "❌ Le numéro employé est obligatoire."
+            )
+            return redirect("envoyer_reference")
+
+        # 🔴 Numéro déjà utilisé
         if Reference.objects.filter(numero_employe=numero_employe).exists():
             messages.error(
                 request,
@@ -466,7 +500,9 @@ def envoyer_reference(request):
 
         # 🔴 Vérifier entreprise destinataire
         try:
-            nouvelle_entreprise = Employeur.objects.get(nom=entreprise_reception_nom)
+            nouvelle_entreprise = Employeur.objects.get(
+                nom=entreprise_reception_nom
+            )
         except Employeur.DoesNotExist:
             messages.error(
                 request,
@@ -495,19 +531,23 @@ def envoyer_reference(request):
 
         messages.success(
             request,
-            f"✅ Référence envoyée avec succès pour {nom_employe} {prenom_employe} "
+            f"✅ Référence envoyée avec succès pour "
+            f"{nom_employe} {prenom_employe} "
             f"(Numéro : {numero_employe})."
         )
-
         return redirect("profil_employeur")
 
     # 🔹 GET → entreprises possibles (sans soi-même)
     entreprises = Employeur.objects.exclude(id=employeur_connecte.id)
 
-    return render(request, "envoyer_reference.html", {
-        "employeur_connecte": employeur_connecte,
-        "entreprises": entreprises,
-    })
+    return render(
+        request,
+        "envoyer_reference.html",
+        {
+            "employeur_connecte": employeur_connecte,
+            "entreprises": entreprises,
+        }
+    )
 
 def modifier_profil(request, employeur_id):  # on récupère l'ID depuis l'URL
     employeur = get_object_or_404(Employeur, id=employeur_id)

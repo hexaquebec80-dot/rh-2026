@@ -132,6 +132,11 @@ textarea.form-control {
   }
 }
 
+.btn-outline-secondary {
+  border-radius: 16px;
+  font-weight: 600;
+}
+
 </style>
 
 <div class="transfer-bg">
@@ -159,20 +164,32 @@ textarea.form-control {
 
         <div class="col-md-6">
           <label class="form-label">Nom de l’employé</label>
-          <input type="text" name="nom_employe" class="form-control" placeholder="Kamara" required>
+          <input type="text" name="nom_employe" class="form-control" placeholder="Nom" required>
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Prénom de l’employé</label>
-          <input type="text" name="prenom_employe" class="form-control" placeholder="Diambere" required>
+          <input type="text" name="prenom_employe" class="form-control" placeholder="Prenom" required>
         </div>
 
-<!-- Date de naissance -->
-    <div class="col-md-6">
-      <label class="form-label">Date de naissance</label>
-      <input type="date" name="date_naissance" class="form-control" 
-             value="{{ employeur.date_naissance|date:'Y-m-d' }}" required>
-    </div>
+<div class="col-md-6">
+  <label class="form-label">Date de naissance</label>
+  <input
+    type="date"
+    name="date_naissance"
+    class="form-control"
+    min="1900-01-01"
+    max="{{ today|date:'Y-m-d' }}"
+    required
+    oninput="forceYearLimit(this)"
+  >
+</div>
+
+
+
+
+
+
 
     <!-- Statut -->
     <div class="col-md-6">
@@ -201,10 +218,31 @@ textarea.form-control {
           <input type="text" name="poste" class="form-control" placeholder="Technicien RH" required>
         </div>
 
-        <div class="col-md-6">
-          <label class="form-label">Numéro employé</label>
-          <input type="text" name="numero_employe" class="form-control" placeholder="EMP-1234" required>
-        </div>
+<div class="col-md-6">
+  <label class="form-label">Type d’opération</label>
+  <select name="type_operation"
+          class="form-control"
+          id="typeOperation"
+          required>
+    <option value="">-- Sélectionner --</option>
+    <option value="transfert">Transfert</option>
+    <option value="embauche">Embauche</option>
+  </select>
+</div>
+
+
+<div class="col-md-6 d-none" id="numeroEmployeField">
+  <label class="form-label">Numéro employé</label>
+  <input type="text"
+         name="numero_employe"
+         id="numeroEmployeInput"
+         class="form-control"
+         placeholder="Numéro employé">
+</div>
+
+
+
+
 
         <div class="col-md-12">
           <label class="form-label">Nouvel employeur</label>
@@ -220,13 +258,22 @@ textarea.form-control {
           <label class="form-label">Message (facultatif)</label>
           <textarea name="message" rows="4" class="form-control" placeholder="Raison ou détails du transfert..."></textarea>
         </div>
+        <!-- Boutons action -->
+<div class="d-flex justify-content-between gap-2 mt-4">
+  <a href="{% url 'profil_employeur' %}" class="btn btn-outline-secondary w-100">
+    <i class="bi bi-arrow-left-circle me-1"></i>
+    Retour au profil
+  </a>
+
+  <button type="submit" formmethod="post" class="btn btn-transfer w-100">
+    <i class="bi bi-send-fill me-1"></i>
+    Envoyer le Transfert
+  </button>
+</div>
+
 
       </div>
 
-      <button type="submit" class="btn btn-transfer w-100 mt-4">
-        <i class="bi bi-send-fill me-1"></i>
-        Envoyer le Transfert
-      </button>
     </form>
 
   </div>
@@ -250,6 +297,48 @@ textarea.form-control {
       nasInput.value = "";
     }
   });
+
+const typeOperation = document.getElementById("typeOperation");
+const numeroField = document.getElementById("numeroEmployeField");
+const numeroInput = document.getElementById("numeroEmployeInput");
+
+typeOperation.addEventListener("change", () => {
+  if (typeOperation.value === "transfert") {
+    numeroField.classList.remove("d-none");
+    numeroInput.required = true;
+    numeroInput.value = "";      // champ vide
+    numeroInput.focus();
+  } else {
+    numeroField.classList.add("d-none");
+    numeroInput.required = false;
+    numeroInput.value = "Embauche";
+  }
+});
+
+
+function forceYearLimit(input) {
+  if (!input.value) return;
+
+  // Autorise uniquement YYYY-MM-DD
+  let match = input.value.match(/^(\d{0,4})(?:-(\d{0,2}))?(?:-(\d{0,2}))?$/);
+  if (!match) {
+    input.value = "";
+    return;
+  }
+
+  let year = match[1];
+  let month = match[2] || "";
+  let day = match[3] || "";
+
+  // 🔴 Coupe l'année à 4 chiffres MAX
+  if (year.length > 5) {
+    year = year.slice(0, 4);
+  }
+
+  input.value = year +
+    (month ? "-" + month : "") +
+    (day ? "-" + day : "");
+}
 </script>
 
 
